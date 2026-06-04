@@ -1,8 +1,8 @@
 # 🧠 Agent Memory Lite
 
-> 轻量级 AI Agent 记忆管理 — 语义搜索、标签过滤、上下文修剪
+> 轻量级 AI Agent 记忆管理 — 语义搜索、标签过滤、重要性修剪
 >
-> Lightweight long-term memory for AI agents. Semantic search, tag filtering, context pruning.
+> Lightweight long-term memory for AI agents. Semantic search, tag filtering, importance-based pruning.
 
 [![PyPI](https://img.shields.io/pypi/v/agent-memory-lite?style=flat)](https://pypi.org/project/agent-memory-lite/)
 [![Python](https://img.shields.io/pypi/pyversions/agent-memory-lite?style=flat)](https://pypi.org/project/agent-memory-lite/)
@@ -16,9 +16,9 @@ Agent 越跑越聪明，但对话历史越来越长 → 成本爆炸、上下文
 
 `agent-memory-lite` 解决三个核心问题：
 
-1. **记什么** — 自动识别值得保留的信息
+1. **记什么** — 由调用方设定 importance score（0-1），标识值得保留的信息
 2. **怎么查** — 语义搜索 + 关键词，秒级召回
-3. **怎么剪** — 智能修剪冗余，保留 80% 信号
+3. **怎么剪** — 按 importance 修剪冗余，支持去重
 
 ---
 
@@ -54,7 +54,11 @@ for r in results:
 # Keyword search + filter
 results = mem.search("React", mode="keyword", tags=["project"])
 
-# Auto-prune: keep top 80% by importance
+# Get/delete by ID
+mem.get(1)
+mem.delete(1)
+
+# Prune: keep top 80% by importance
 mem.prune(keep_ratio=0.8)
 
 # Get stats
@@ -69,12 +73,12 @@ print(mem.stats())
 | 功能 | 描述 |
 |------|------|
 | **Semantic Search** | 基于 embedding 的语义搜索，默认使用轻量模型 |
-| **Keyword Search** | 正则 + 关键词匹配 |
+| **Keyword Search** | 关键词子串匹配 |
 | **Tag Filtering** | 标签分类 + 过滤 |
-| **Auto-prune** | 按重要性自动修剪，保留信号 |
-| **Deduplication** | Prune 时自动去重相似记忆 |
+| **Importance Pruning** | 按 importance 修剪，保留高优先级记忆 |
+| **Deduplication** | Prune 时自动去重相似记忆（Jaccard similarity） |
 | **SQLite Backend** | 零配置持久化 |
-| **Importance Score** | 0-1 重要性评分 |
+| **CRUD API** | save / search / get / delete / prune / stats / export |
 
 ---
 
@@ -98,15 +102,17 @@ print(mem.stats())
 
 | Method | Description |
 |--------|-------------|
-| `save(content, tags=[], importance=0.5)` | 保存记忆 |
+| `save(content, tags=[], importance=0.5)` | 保存记忆 → 返回 ID |
 | `search(query, top_k=5, mode="semantic", tags=None)` | 搜索记忆 |
-| `get(memory_id)` | 按 ID 获取单条记忆 |
+| `get(memory_id)` | 按 ID 获取单条记忆 → MemoryResult 或 None |
 | `delete(memory_id)` | 删除指定记忆 |
-| `prune(keep_ratio=0.8)` | 修剪低重要度记忆 |
+| `prune(keep_ratio=0.8)` | 修剪低 importance 记忆 |
 | `stats()` | 获取统计信息 |
-| `clear()` | 清空所有记忆 |
-| `export()` | 导出全部记忆 |
+| `clear()` | 清空所有记忆（含 embeddings） |
+| `export()` | 导出全部记忆为 list[dict] |
 | `close()` | 关闭数据库连接 |
+
+**参数校验：** 所有公开方法均做严格输入校验。`content` 不允许空字符串，`importance` 必须在 [0,1]，`keep_ratio` 必须在 (0,1]，`mode` 只接受 `"semantic"` 或 `"keyword"`。
 
 ---
 
@@ -117,9 +123,9 @@ print(mem.stats())
 | 零配置 | ✅ | ❌ | ❌ |
 | 本地运行 | ✅ | ✅ | ❌ |
 | 轻量 | ✅ | ❌ | ❌ |
-| 自动修剪 | ✅ | ❌ | ❌ |
+| Importance 修剪 | ✅ | ❌ | ❌ |
 | SQLite | ✅ | ❌ | ❌ |
-| 中文友好 | ✅ | ❌ | ❌ |
+| 中文去重 | ✅ | ❌ | ❌ |
 
 ---
 
@@ -129,10 +135,12 @@ print(mem.stats())
 agent-memory-lite/
 ├── agent_memory/
 │   ├── __init__.py
-│   ├── memory.py      # Core Memory class
-│   ├── storage.py     # SQLite backend
+│   ├── memory.py      # Core Memory class + validators
+│   ├── storage.py     # SQLite backend + embeddings cache
 │   ├── search.py      # Semantic + keyword search
-│   └── prune.py       # Auto-pruning logic
+│   └── prune.py       # Importance-based pruning + dedup
+├── tests/
+│   └── test_memory.py
 ├── README.md
 ├── LICENSE
 └── pyproject.toml
