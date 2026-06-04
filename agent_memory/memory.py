@@ -91,3 +91,7 @@ class Memory:
             memory_id: The memory ID to delete.
         """
         self.storage.delete_by_ids([memory_id])
+
+    def close(self):
+        """Close the database connection and free resources."""
+        self.storage.close()

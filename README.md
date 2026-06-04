@@ -106,6 +106,7 @@ print(mem.stats())
 | `stats()` | 获取统计信息 |
 | `clear()` | 清空所有记忆 |
 | `export()` | 导出全部记忆 |
+| `close()` | 关闭数据库连接 |
 
 ---
 

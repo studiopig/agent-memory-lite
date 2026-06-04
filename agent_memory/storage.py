@@ -22,6 +22,14 @@ class MemoryResult:
     def __repr__(self):
         return f"MemoryResult(id={self.id}, score={self.score:.2f})"
 
+    def __str__(self):
+        return self.content
+
+    def __eq__(self, other):
+        if not isinstance(other, MemoryResult):
+            return False
+        return self.id == other.id
+
 
 class Storage:
     """SQLite-backed memory persistence."""
@@ -33,6 +41,7 @@ class Storage:
 
     def _init_db(self):
         with sqlite3.connect(self.db_path) as conn:
+            conn.execute("PRAGMA foreign_keys = ON")
             conn.execute("""
                 CREATE TABLE IF NOT EXISTS memories (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -96,6 +105,7 @@ class Storage:
         with sqlite3.connect(self.db_path) as conn:
             placeholders = ",".join("?" * len(ids))
             conn.execute(f"DELETE FROM memories WHERE id IN ({placeholders})", ids)
+            conn.execute(f"DELETE FROM embeddings WHERE memory_id IN ({placeholders})", ids)
 
     def stats(self) -> dict:
         with sqlite3.connect(self.db_path) as conn:
@@ -139,8 +149,12 @@ class Storage:
                 (memory_id, blob),
             )
 
+    def close(self):
+        """Close the database connection pool. No-op for SQLite (connections are ephemeral)."""
+
     def clear(self):
         with sqlite3.connect(self.db_path) as conn:
+            conn.execute("DELETE FROM embeddings")
             conn.execute("DELETE FROM memories")
 
     def export(self) -> list:

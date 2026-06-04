@@ -25,7 +25,7 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-semantic = ["sentence-transformers"]
+semantic = ["sentence-transformers", "numpy"]
 
 [project.urls]
 Homepage = "https://github.com/studiopig/agent-memory-lite"
