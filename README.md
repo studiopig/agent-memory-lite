@@ -63,7 +63,7 @@ mem.prune(keep_ratio=0.8)
 
 # Get stats
 print(mem.stats())
-# {'total': 42, 'total_chars': 5210, 'top_tags': ['project', 'user-pref']}
+# {'total': 42, 'total_bytes': 5210, 'top_tags': ['project', 'user-pref']}
 ```
 
 ---

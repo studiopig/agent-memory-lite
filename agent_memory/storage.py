@@ -110,7 +110,7 @@ class Storage:
     def stats(self) -> dict:
         with sqlite3.connect(self.db_path) as conn:
             total = conn.execute("SELECT COUNT(*) FROM memories").fetchone()[0]
-            total_chars = conn.execute("SELECT COALESCE(SUM(LENGTH(content)), 0) FROM memories").fetchone()[0]
+            total_bytes = conn.execute("SELECT COALESCE(SUM(LENGTH(content)), 0) FROM memories").fetchone()[0]
             tags_raw = conn.execute("SELECT tags FROM memories").fetchall()
             all_tags = []
             for (t,) in tags_raw:
@@ -118,7 +118,7 @@ class Storage:
             tag_counts = Counter(all_tags).most_common(10)
             return {
                 "total": total,
-                "total_chars": total_chars,
+                "total_bytes": total_bytes,
                 "top_tags": [t[0] for t in tag_counts],
             }
 

@@ -76,7 +76,7 @@ class Searcher:
         return results[:top_k]
 
     def keyword_search(self, query: str, top_k: int = 5, tags: list = None) -> list:
-        """Keyword/regex-based search."""
+        """Substring-based keyword search."""
         memories = self.storage.get_all()
 
         if tags:
