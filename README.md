@@ -66,6 +66,31 @@ print(mem.stats())
 # {'total': 42, 'total_bytes': 5210, 'top_tags': ['project', 'user-pref']}
 ```
 
+### 🔌 Run as MCP Server
+
+```bash
+# Install with MCP support
+pip install agent-memory-lite[mcp]
+
+# Start the server (for Claude Desktop / Cline / Continue)
+agent-memory serve --storage ./my_memories
+```
+
+MCP client config:
+
+```json
+{
+  "mcpServers": {
+    "memory": {
+      "command": "agent-memory",
+      "args": ["serve", "--storage", "./agent_memory"]
+    }
+  }
+}
+```
+
+Available MCP tools: `memory_save`, `memory_search`, `memory_get`, `memory_delete`, `memory_prune`, `memory_stats`, `memory_clear`, `memory_export`.
+
 ---
 
 ## 🔧 Features
@@ -138,7 +163,11 @@ agent-memory-lite/
 │   ├── memory.py      # Core Memory class + validators
 │   ├── storage.py     # SQLite backend + embeddings cache
 │   ├── search.py      # Semantic + keyword search
-│   └── prune.py       # Importance-based pruning + dedup
+│   ├── prune.py       # Importance-based pruning + dedup
+│   ├── server.py      # MCP Server wrapper
+│   └── cli.py         # CLI entry point
+├── examples/
+│   └── demo.py        # Full workflow demo
 ├── tests/
 │   └── test_memory.py
 ├── README.md
@@ -151,9 +180,9 @@ agent-memory-lite/
 ## 🤝 Contributing
 
 欢迎 PR！特别需要：
-- 🧪 更多 embedding 后端支持
-- 🔌 MCP Server 封装
+- 🧪 更多 embedding 后端支持（OpenAI、Cohere 等）
 - 📊 记忆可视化 Dashboard
+- 🌐 REST API 封装
 
 ---
 
