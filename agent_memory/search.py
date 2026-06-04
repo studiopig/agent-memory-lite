@@ -29,7 +29,11 @@ class Searcher:
         return self._model
 
     def semantic_search(self, query: str, top_k: int = 5, tags: list = None) -> list:
-        """Semantic search using embeddings."""
+        """Semantic search using embeddings.
+
+        Embeddings are cached in the SQLite database so they are
+        computed only once per memory, then reused on subsequent searches.
+        """
         model = self._get_model()
         memories = self.storage.get_all()
 
@@ -41,17 +45,22 @@ class Searcher:
         if not memories:
             return []
 
-        # Compute embeddings
+        # Compute query embedding
         query_emb = model.encode([query])[0]
-        memory_texts = [m.content for m in memories]
-        memory_embs = model.encode(memory_texts)
+
+        # Load or compute memory embeddings (cached in SQLite)
+        memory_embs = []
+        for m in memories:
+            emb = self.storage.get_embedding(m.id)
+            if emb is None:
+                emb = model.encode([m.content])[0]
+                self.storage.save_embedding(m.id, emb)
+            memory_embs.append(emb)
 
         # Cosine similarity
-        from numpy import dot
-        from numpy.linalg import norm
-
+        import numpy as np
         scores = [
-            float(dot(query_emb, mem_emb) / (norm(query_emb) * norm(mem_emb) + 1e-8))
+            float(np.dot(query_emb, mem_emb) / (np.linalg.norm(query_emb) * np.linalg.norm(mem_emb) + 1e-8))
             for mem_emb in memory_embs
         ]
 

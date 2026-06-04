@@ -100,6 +100,8 @@ print(mem.stats())
 |--------|-------------|
 | `save(content, tags=[], importance=0.5)` | 保存记忆 |
 | `search(query, top_k=5, mode="semantic", tags=None)` | 搜索记忆 |
+| `get(memory_id)` | 按 ID 获取单条记忆 |
+| `delete(memory_id)` | 删除指定记忆 |
 | `prune(keep_ratio=0.8)` | 修剪低重要度记忆 |
 | `stats()` | 获取统计信息 |
 | `clear()` | 清空所有记忆 |

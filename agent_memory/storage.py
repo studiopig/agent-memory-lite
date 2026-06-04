@@ -4,6 +4,7 @@ import json
 import os
 import sqlite3
 import time
+import struct
 from collections import Counter
 from typing import Optional
 
@@ -110,6 +111,33 @@ class Storage:
                 "total_chars": total_chars,
                 "top_tags": [t[0] for t in tag_counts],
             }
+
+    def get_embedding(self, memory_id: int):
+        """Get cached embedding for a memory, or None if not cached.
+
+        Returns a numpy array, or None.
+        """
+        try:
+            import numpy as np
+        except ImportError:
+            return None
+        with sqlite3.connect(self.db_path) as conn:
+            row = conn.execute(
+                "SELECT vector FROM embeddings WHERE memory_id = ?", (memory_id,)
+            ).fetchone()
+        if row and row[0]:
+            n = len(row[0]) // 4
+            return np.frombuffer(row[0], dtype=np.float32).copy()
+        return None
+
+    def save_embedding(self, memory_id: int, vector):
+        """Cache an embedding vector for a memory."""
+        blob = vector.astype("float32").tobytes()
+        with sqlite3.connect(self.db_path) as conn:
+            conn.execute(
+                "INSERT OR REPLACE INTO embeddings (memory_id, vector) VALUES (?, ?)",
+                (memory_id, blob),
+            )
 
     def clear(self):
         with sqlite3.connect(self.db_path) as conn:

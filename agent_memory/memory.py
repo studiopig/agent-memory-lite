@@ -71,3 +71,23 @@ class Memory:
     def export(self) -> list:
         """Export all memories as list of dicts."""
         return self.storage.export()
+
+    def get(self, memory_id: int):
+        """Retrieve a single memory by ID.
+
+        Args:
+            memory_id: The memory ID.
+
+        Returns:
+            MemoryResult or None if not found.
+        """
+        results = self.storage.get_by_ids([memory_id])
+        return results[0] if results else None
+
+    def delete(self, memory_id: int):
+        """Delete a single memory by ID.
+
+        Args:
+            memory_id: The memory ID to delete.
+        """
+        self.storage.delete_by_ids([memory_id])

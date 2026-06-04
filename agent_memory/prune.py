@@ -49,11 +49,27 @@ class Pruner:
             self.storage.delete_by_ids(list(to_delete))
 
     def _similarity(self, a: str, b: str) -> float:
-        """Simple Jaccard-like similarity for deduplication."""
+        """Jaccard similarity for deduplication.
+
+        Uses word-level for languages with spaces (English),
+        character bigrams for CJK and other non-spaced scripts.
+        """
         if not a or not b:
             return 0.0
-        set_a = set(a.lower().split())
-        set_b = set(b.lower().split())
+        a_lower = a.lower()
+        b_lower = b.lower()
+
+        # Word-level sets
+        set_a = set(a_lower.split())
+        set_b = set(b_lower.split())
+
+        # If word-level gives too few tokens (CJK text without spaces),
+        # fall back to character bigrams
+        total_words = len(set_a | set_b)
+        if total_words <= 2 and len(a_lower) > 5:
+            set_a = set(a_lower[i:i+2] for i in range(len(a_lower)-1))
+            set_b = set(b_lower[i:i+2] for i in range(len(b_lower)-1))
+
         if not set_a or not set_b:
             return 0.0
         return len(set_a & set_b) / len(set_a | set_b)
