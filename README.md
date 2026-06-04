@@ -127,7 +127,7 @@ Available MCP tools: `memory_save`, `memory_search`, `memory_get`, `memory_delet
 
 | Method | Description |
 |--------|-------------|
-| `save(content, tags=[], importance=0.5)` | 保存记忆 → 返回 ID |
+| `save(content, tags=None, importance=0.5)` | 保存记忆 → 返回 ID |
 | `search(query, top_k=5, mode="semantic", tags=None)` | 搜索记忆 |
 | `get(memory_id)` | 按 ID 获取单条记忆 → MemoryResult 或 None |
 | `delete(memory_id)` | 删除指定记忆 |
