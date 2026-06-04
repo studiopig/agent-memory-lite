@@ -5,5 +5,13 @@ __author__ = "sunshine"
 __license__ = "MIT"
 
 from .memory import Memory
+from .memory import (
+    _normalize_tags,
+    _validate_importance,
+    _validate_keep_ratio,
+    _validate_top_k,
+    _validate_mode,
+    _validate_non_empty,
+)
 
 __all__ = ["Memory"]

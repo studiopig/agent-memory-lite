@@ -1,8 +1,8 @@
 # 🧠 Agent Memory Lite
 
-> 轻量级 AI Agent 记忆管理 — 语义搜索、自动摘要、上下文修剪
+> 轻量级 AI Agent 记忆管理 — 语义搜索、标签过滤、上下文修剪
 >
-> Lightweight long-term memory for AI agents. Semantic search, auto-summarization, context pruning.
+> Lightweight long-term memory for AI agents. Semantic search, tag filtering, context pruning.
 
 [![PyPI](https://img.shields.io/pypi/v/agent-memory-lite?style=flat)](https://pypi.org/project/agent-memory-lite/)
 [![Python](https://img.shields.io/pypi/pyversions/agent-memory-lite?style=flat)](https://pypi.org/project/agent-memory-lite/)
@@ -72,7 +72,7 @@ print(mem.stats())
 | **Keyword Search** | 正则 + 关键词匹配 |
 | **Tag Filtering** | 标签分类 + 过滤 |
 | **Auto-prune** | 按重要性自动修剪，保留信号 |
-| **Deduplication** | 自动去重相似记忆 |
+| **Deduplication** | Prune 时自动去重相似记忆 |
 | **SQLite Backend** | 零配置持久化 |
 | **Importance Score** | 0-1 重要性评分 |
 

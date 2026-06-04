@@ -15,8 +15,16 @@ class Pruner:
         Also removes near-duplicate memories (content similarity > 90%).
 
         Args:
-            keep_ratio: Fraction of memories to keep (0.0-1.0).
+            keep_ratio: Fraction of memories to keep, in (0, 1].
+
+        Raises:
+            ValueError: If keep_ratio is out of range.
         """
+        if not isinstance(keep_ratio, (int, float)):
+            raise TypeError("keep_ratio must be a number")
+        if not 0 < keep_ratio <= 1:
+            raise ValueError("keep_ratio must be in (0, 1]")
+
         memories = self.storage.get_all()
         if not memories:
             return
