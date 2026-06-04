@@ -35,3 +35,6 @@ mcp = ["mcp"]
 [project.urls]
 Homepage = "https://github.com/studiopig/agent-memory-lite"
 Repository = "https://github.com/studiopig/agent-memory-lite"
+
+[tool.hatch.build.targets.wheel]
+packages = ["agent_memory"]
