@@ -107,6 +107,22 @@ Available MCP tools: `memory_save`, `memory_search`, `memory_get`, `memory_delet
 
 ---
 
+## 🎯 适用场景
+
+- 个人 AI Agent 的本地长期记忆
+- Claude Desktop / Cline / Continue 等 MCP 客户端的记忆后端
+- 小型项目上下文保存和用户偏好记录
+- 需要可解释、可导出、可删除的记忆方案
+
+## ⚠️ 不适用场景
+
+- 企业级知识库或多用户权限系统
+- 大规模 RAG（数千+文档）
+- 复杂知识图谱或强审计合规场景
+- 需要高并发读写的在线服务
+
+---
+
 ## 🏗 Architecture
 
 ```
@@ -138,6 +154,26 @@ Available MCP tools: `memory_save`, `memory_search`, `memory_get`, `memory_delet
 | `close()` | 关闭数据库连接 |
 
 **参数校验：** 所有公开方法均做严格输入校验。`content` 不允许空字符串，`importance` 必须在 [0,1]，`keep_ratio` 必须在 (0,1]，`mode` 只接受 `"semantic"` 或 `"keyword"`。
+
+---
+
+## 🔄 记忆生命周期
+
+| 阶段 | 方法 | 说明 |
+|------|------|------|
+| 保存 | `save()` | 存入 SQLite，自动去重 |
+| 搜索 | `search()` | 关键词子串匹配 + 可选语义搜索 |
+| 衰减 | `importance` | 0.0-1.0 权重，修剪时低分优先淘汰 |
+| 修剪 | `prune()` | 按 `keep_ratio` 保留高分记忆 |
+| 删除 | `delete()` | 按 ID 精确删除 |
+| 导出 | `export()` | 导出全部记忆为 `list[dict]` |
+
+## 🔒 隐私说明
+
+- 所有数据存储在本地 SQLite 文件，不上传任何服务器
+- 不会自动收集 token、密钥、身份证件等敏感信息
+- `delete()` 和 `clear()` 操作物理清除数据，不可恢复
+- 建议定期备份 `.db` 文件
 
 ---
 
