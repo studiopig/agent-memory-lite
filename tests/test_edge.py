@@ -68,7 +68,7 @@ def test_save_with_emoji(mem):
 
 def test_search_empty_db(mem):
     """Searching empty DB should return empty list, not crash."""
-    results = mem.search("anything")
+    results = mem.search("anything", mode="keyword")
     assert results == []
 
 
